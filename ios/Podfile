@@ -1,0 +1,42 @@
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+platform :ios, '10.0'
+
+target 'jitsimeet' do
+  config = use_native_modules!
+
+  use_react_native!(:path => config["reactNativePath"])
+
+  pod "JitsiMeetSDK", :git => "https://github.com/RistoBIn/jitsi_ios_sdk.git"
+
+  target 'jitsimeetTests' do
+    inherit! :complete
+    # Pods for testing
+  end
+
+  # Enables Flipper.
+  #
+  # Note that if you have use_frameworks! enabled, Flipper will not work and
+  # you should disable these next few lines.
+  use_flipper!
+  post_install do |installer|
+    flipper_post_install(installer)
+    installer.pods_project.targets.each do |target|
+      if target.name == 'react-native-jitsi-meet'
+        target.build_configurations.each do |config|
+          config.build_settings['FRAMEWORK_SEARCH_PATHS'] ||= "${PODS_ROOT}/JitsiMeetSDK/Frameworks"
+        end
+      end
+    end
+  end
+end
+
+target 'jitsimeet-tvOS' do
+  # Pods for jitsimeet-tvOS
+
+  target 'jitsimeet-tvOSTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+end
